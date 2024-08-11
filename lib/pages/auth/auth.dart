@@ -22,6 +22,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           title: const Text('Todo App'),
         ),
         body: isLoginPage

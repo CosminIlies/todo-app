@@ -1,31 +1,25 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:todo_app/pages/auth/auth.dart';
-import 'package:todo_app/pages/auth/login.dart';
-import 'package:todo_app/pages/auth/register.dart';
 import 'package:todo_app/pages/main_page.dart';
+import 'package:todo_app/pages/settings.dart';
+import 'package:todo_app/services/auth_service.dart';
+import 'package:todo_app/services/messaging_service.dart';
 import 'package:todo_app/theme/theme_constants.dart';
 import 'package:todo_app/theme/theme_manager.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  AuthService.initialize();
+  await MessagingService().init();
+
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  runApp(const Main());
 }
 
 ThemeManager themeManager = ThemeManager();
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Todo App',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: themeManager.themeMode,
-      home: const Main(),
-    );
-  }
-}
 
 class Main extends StatefulWidget {
   const Main({super.key});
@@ -48,12 +42,29 @@ class _MainState extends State<Main> {
   }
 
   themeListener() {
-    print(themeManager.themeMode);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MainPage();
+    return MaterialApp(
+      title: 'Todo App',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeManager.themeMode,
+      home: AuthService.user == null
+          ? const AuthenticationPage()
+          : const MainPage(),
+      routes: {
+        "/main": (context) => AuthService.user == null
+            ? const AuthenticationPage()
+            : const MainPage(),
+        "/settings": (context) => Settings(
+              themeManager: themeManager,
+            ),
+      },
+    );
   }
 }

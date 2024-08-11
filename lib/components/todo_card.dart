@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/modals/todo_modal.dart';
 import 'package:todo_app/model/todo_model.dart';
+import 'package:todo_app/services/database_service.dart';
 import 'package:todo_app/uitls/helper_widgets.dart';
 
 class TodoCard extends StatefulWidget {
@@ -14,10 +16,25 @@ class TodoCard extends StatefulWidget {
 class _TodoCardState extends State<TodoCard> {
   @override
   Widget build(BuildContext context) {
+    List<Color> bgColors = Theme.of(context).brightness == Brightness.light
+        ? [
+            Color.fromARGB(255, 210, 240, 211),
+            Color.fromARGB(255, 149, 179, 150),
+            Color.fromARGB(255, 218, 155, 155),
+            Color.fromARGB(255, 167, 83, 83)
+          ]
+        : [
+            Color.fromARGB(255, 105, 212, 109),
+            Color.fromARGB(255, 46, 124, 48),
+            Color.fromARGB(255, 179, 69, 69),
+            Color.fromARGB(255, 104, 21, 21)
+          ];
+
     return InkWell(
         onTap: () {
           setState(() {
             widget.todo.isDone = !widget.todo.isDone;
+            DatabaseService.updateTodo(widget.todo);
           });
         },
         child: Card(
@@ -29,10 +46,16 @@ class _TodoCardState extends State<TodoCard> {
               borderRadius: BorderRadius.circular(10),
               gradient: LinearGradient(
                 colors: [
-                  widget.todo.isDone ? Colors.green : Colors.grey,
                   widget.todo.isDone
-                      ? Color.fromARGB(255, 36, 92, 38)
-                      : Color.fromARGB(255, 97, 97, 97),
+                      ? bgColors[0]
+                      : widget.todo.isOverdue()
+                          ? bgColors[2]
+                          : Theme.of(context).primaryColor,
+                  widget.todo.isDone
+                      ? bgColors[1]
+                      : widget.todo.isOverdue()
+                          ? bgColors[3]
+                          : Theme.of(context).primaryColorDark,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -44,21 +67,55 @@ class _TodoCardState extends State<TodoCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(widget.todo.title),
-                        Text(widget.todo.priority == 1 ? 'High' : 'Low'),
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: widget.todo.priorityColor(),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Text(
+                            widget.todo.priorityStr(),
+                            style: TextStyle(color: Colors.black),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
                       ],
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(50),
+                    Row(children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(!widget.todo.isDone
+                              ? widget.todo.dueDateStr()
+                              : 'Done'),
+                        ),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('2d'),
-                      ),
-                    )
+                      IconButton(
+                        color: Theme.of(context).colorScheme.secondary,
+                        icon: const Icon(Icons
+                            .edit_document), // Wrap Icons.edit_document with Icon widget
+                        onPressed: () {
+                          final res = showModalBottomSheet<String>(
+                              isScrollControlled: true,
+                              context: context,
+                              enableDrag: true,
+                              builder: (BuildContext context) {
+                                return TodoModal(todo: widget.todo);
+                              }).then((value) {
+                            Navigator.pushReplacementNamed(context, '/main');
+                          });
+                        },
+                      )
+                    ])
                   ],
                 ),
                 addVerticalSpace(20),

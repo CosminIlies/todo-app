@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:todo_app/services/auth_service.dart';
 import 'package:todo_app/uitls/helper_widgets.dart';
+import 'package:todo_app/uitls/validation.dart';
 
 class Login extends StatefulWidget {
   Function callback;
@@ -11,6 +15,15 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  // String email = '';
+  // String password = '';
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String? emailError;
+  String? passwordError;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,16 +37,29 @@ class _LoginState extends State<Login> {
             style: TextStyle(fontSize: 30),
           ),
           addVerticalSpace(20),
-          const TextField(
+          TextField(
+            // onChanged: (value) {
+            //   email = value;
+            // },
+            controller: emailController,
             decoration: InputDecoration(
+              errorText: emailError,
               border: OutlineInputBorder(),
               label: Text('Email'),
               hintText: 'Enter your username',
             ),
           ),
           addVerticalSpace(20),
-          const TextField(
+          TextField(
+            // onChanged: (value) {
+            //   password = value;
+            // },
+            controller: passwordController,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
             decoration: InputDecoration(
+              errorText: passwordError,
               border: OutlineInputBorder(),
               label: Text('Password'),
               hintText: 'Enter your password',
@@ -59,7 +85,31 @@ class _LoginState extends State<Login> {
             ],
           ),
           addVerticalSpace(20),
-          ElevatedButton(onPressed: () {}, child: const Text('Login')),
+          ElevatedButton(
+              onPressed: () {
+                final email = emailController.text;
+                final password = passwordController.text;
+
+                setState(() {
+                  emailError = validateEmail(email);
+                  passwordError = validatePassword(password);
+                });
+
+                if (emailError == null && passwordError == null) {
+                  print(email);
+                  print(password);
+                  AuthService.login(email, password).then((value) {
+                    if (!value) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Invalid credentials')));
+                      return;
+                    }
+
+                    Navigator.pushReplacementNamed(context, '/main');
+                  });
+                }
+              },
+              child: const Text('Login')),
         ],
       ),
     );
