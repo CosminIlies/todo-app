@@ -45,8 +45,13 @@ class _TodoModalState extends State<TodoModal> {
   }
 
   Future<void> _selectDate() async {
+    // DateTime? _pickedDate = await showDatePicker(
+    //     context: context, firstDate: DateTime.now(), lastDate: DateTime(2040));
     DateTime? _pickedDate = await showDatePicker(
-        context: context, firstDate: DateTime.now(), lastDate: DateTime(2040));
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2040));
 
     TimeOfDay? _pickedTime = await showTimePicker(
         context: context, initialTime: const TimeOfDay(hour: 0, minute: 0));
