@@ -85,14 +85,5 @@ class DatabaseService {
     print(snapshot.docs);
 
     return snapshot.docs.map((e) => TodoModel.fromSnapshot(e)).toList();
-
-    // return _todosCollections
-    //     .doc(AuthService.user!.uid)
-    //     .collection("todo")
-    //     .snapshots()
-    //     .map((QuerySnapshot query) => query.docs
-    //         .map((DocumentSnapshot doc) =>
-    //             TodoModel.fromJson(doc.data() as Map<String, dynamic>))
-    //         .toList());
   }
 }

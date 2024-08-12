@@ -1,0 +1,44 @@
+
+// exports.sendNotificationsWhenDueDateIsClose = onSchedule(
+//   "every 15 seconds",
+//   async () => {
+//     admin
+//       .firestore()
+//       .collection("users")
+//       .get()
+//       .then((userSnapshot: any) => {
+//         userSnapshot.forEach((userDoc: any) => {
+//           userDoc.data().token;
+//           admin.messaging().sendToDevice(userDoc.data().token, {
+//             notification: {
+//               title: "New todo added",
+//               body: "A new todo was added!",
+//             },
+//           });
+//         });
+//       });
+//   }
+// );
+
+
+ // userDoc.ref
+              //   .collection("todo")
+              //   .get()
+              //   .then((todosSnapshot: any) => {
+              //     counter++;
+
+              //     todosSnapshot.map((todoDoc: any) => {
+              //       counter++;
+              //       const dueDate = todoDoc.data().dueDate.toDate();
+
+              //       if (dueDate < new Date()) {
+              //         counter++;
+              //         admin.messaging().sendToDevice(userDoc.data().fcmToken,{
+              //           notification: {
+              //             title: todoDoc.data().title + " is overdue",
+              //             body: "Todo is overdue!",
+              //           },
+              //         });
+              //       }
+              //     });
+              //   });
